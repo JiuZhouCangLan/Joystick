@@ -10,6 +10,7 @@ class JoyStick : public QLabel
 public:
     JoyStick(QWidget *parent = nullptr);
     QPoint getPos();
+    void setRange(uint maxValue);
 
 signals:
     void posChanged(QPoint);
@@ -30,6 +31,7 @@ private:
     int baseRadius;
     int joyRadius;
     int stickRadius;
+    int range = 100;
 };
 
 #endif // JOYSTICK_H

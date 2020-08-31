@@ -18,6 +18,11 @@ QPoint JoyStick::getPos()
     return lastPos;
 }
 
+void JoyStick::setRange(uint maxValue)
+{
+    range = static_cast<int>(maxValue);
+}
+
 void JoyStick::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event)
@@ -72,7 +77,7 @@ void JoyStick::mouseReleaseEvent(QMouseEvent *event)
 void JoyStick::showEvent(QShowEvent *event)
 {
     QRect rect = this->rect();
-    setMask(QRegion(rect.marginsAdded(QMargins(2, 2, 2, 2)), QRegion::Ellipse));
+    setMask(QRegion(rect, QRegion::Ellipse));
 
     edgeLength = qMin(rect.width(), rect.height());
     baseRadius = (edgeLength - SPACE * 2) / 2;
@@ -119,13 +124,19 @@ void JoyStick::setValue(QPoint pos)
         joyPos = center + offset;
     }
 
-    offset.setX(static_cast<int>(offset.x() * 100 / availableR));
-    offset.setY(-static_cast<int>(offset.y() * 100 / availableR));
-    if(offset != lastPos) {
-        emit posChanged(offset);
-        update();
-        lastPos = offset;
+    if(range < 100) {
+        offset.setX(static_cast<int>(offset.x() * 100 / availableR));
+        offset.setY(-static_cast<int>(offset.y() * 100 / availableR));
+        offset = offset * range / 100;
+    } else {
+        offset.setX(static_cast<int>(offset.x() * range / availableR));
+        offset.setY(-static_cast<int>(offset.y() * range / availableR));
     }
 
+    if(offset != lastPos) {
+        emit posChanged(offset);
+        lastPos = offset;
+    }
+    update();
 }
 
